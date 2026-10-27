@@ -1,0 +1,359 @@
+{
+  "entities": {
+    "Account": {
+      "title": "Account",
+      "description": "Player game account linked to Firebase Authentication UID.",
+      "type": "object",
+      "properties": {
+        "ownerId": {
+          "type": "string",
+          "description": "Firebase Auth UID of the account owner.",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "gameUsername": {
+          "type": "string",
+          "description": "In-game account login handle.",
+          "minLength": 3,
+          "maxLength": 24,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "serverId": {
+          "type": "string",
+          "description": "Selected game server identifier.",
+          "minLength": 1,
+          "maxLength": 32,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "status": {
+          "type": "string",
+          "description": "Account lifecycle status.",
+          "enum": ["active", "archived"],
+          "minLength": 6,
+          "maxLength": 16
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server creation timestamp."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server last update timestamp."
+        }
+      },
+      "required": ["ownerId", "gameUsername", "serverId", "status", "createdAt", "updatedAt"]
+    },
+    "Character": {
+      "title": "Character",
+      "description": "Playable 3D MMORPG character with stats, equipment, mount, quest state, and inventory.",
+      "type": "object",
+      "properties": {
+        "ownerId": {
+          "type": "string",
+          "description": "Owner Firebase Auth UID referencing /accounts/{ownerId}.",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "name": {
+          "type": "string",
+          "description": "Character display name in the 3D world.",
+          "minLength": 2,
+          "maxLength": 40
+        },
+        "classId": {
+          "type": "string",
+          "description": "Character class identifier.",
+          "enum": ["esper", "vanguard", "evolver"],
+          "minLength": 5,
+          "maxLength": 16
+        },
+        "level": {
+          "type": "number",
+          "description": "Character level from 1 to 500."
+        },
+        "exp": {
+          "type": "number",
+          "description": "Current experience points."
+        },
+        "gold": {
+          "type": "number",
+          "description": "Wasteland crystal credits."
+        },
+        "gems": {
+          "type": "number",
+          "description": "Enhancement energy cores (Bless/Soul equivalent)."
+        },
+        "statPoints": {
+          "type": "number",
+          "description": "Unallocated attribute points."
+        },
+        "str": {
+          "type": "number",
+          "description": "Strength attribute."
+        },
+        "agi": {
+          "type": "number",
+          "description": "Agility attribute."
+        },
+        "vit": {
+          "type": "number",
+          "description": "Vitality attribute."
+        },
+        "ene": {
+          "type": "number",
+          "description": "Energy / Psionic attribute."
+        },
+        "hpPotions": {
+          "type": "number",
+          "description": "Count of medkits in belt."
+        },
+        "mpPotions": {
+          "type": "number",
+          "description": "Count of energy cells in belt."
+        },
+        "mapId": {
+          "type": "number",
+          "description": "Current map index (1 to 32)."
+        },
+        "hairColor": {
+          "type": "string",
+          "description": "Hex color for hair or visor.",
+          "minLength": 4,
+          "maxLength": 9,
+          "pattern": "^#[0-9a-fA-F]{3,8}$"
+        },
+        "accentColor": {
+          "type": "string",
+          "description": "Hex color for armor energy trim.",
+          "minLength": 4,
+          "maxLength": 9,
+          "pattern": "^#[0-9a-fA-F]{3,8}$"
+        },
+        "equippedWeapon": {
+          "type": "string",
+          "description": "Item ID of equipped weapon.",
+          "minLength": 1,
+          "maxLength": 48
+        },
+        "equippedArmor": {
+          "type": "string",
+          "description": "Item ID of equipped chest armor.",
+          "minLength": 1,
+          "maxLength": 48
+        },
+        "equippedHelm": {
+          "type": "string",
+          "description": "Item ID of equipped helmet.",
+          "minLength": 1,
+          "maxLength": 48
+        },
+        "equippedGloves": {
+          "type": "string",
+          "description": "Item ID of equipped gauntlets.",
+          "minLength": 1,
+          "maxLength": 48
+        },
+        "equippedPants": {
+          "type": "string",
+          "description": "Item ID of equipped greaves/pants.",
+          "minLength": 1,
+          "maxLength": 48
+        },
+        "equippedBoots": {
+          "type": "string",
+          "description": "Item ID of equipped boots.",
+          "minLength": 1,
+          "maxLength": 48
+        },
+        "equippedRing": {
+          "type": "string",
+          "description": "Item ID of equipped core ring.",
+          "minLength": 1,
+          "maxLength": 48
+        },
+        "equippedWings": {
+          "type": "string",
+          "description": "Item ID of equipped jetpack/wings.",
+          "minLength": 1,
+          "maxLength": 48
+        },
+        "equippedMount": {
+          "type": "string",
+          "description": "Item ID of equipped 3D mount.",
+          "minLength": 1,
+          "maxLength": 48
+        },
+        "enhanceLevel": {
+          "type": "number",
+          "description": "Equipment enhancement level (+0 to +15)."
+        },
+        "mounted": {
+          "type": "boolean",
+          "description": "Whether character is currently riding mount."
+        },
+        "questIndex": {
+          "type": "number",
+          "description": "Current main quest index."
+        },
+        "questProgress": {
+          "type": "number",
+          "description": "Current kill/objective count for active quest."
+        },
+        "skillLevels": {
+          "type": "array",
+          "description": "6 skill upgrade levels (bounded length 6)."
+        },
+        "inventoryIds": {
+          "type": "array",
+          "description": "Bounded list (max 40) of item IDs in inventory bag."
+        },
+        "status": {
+          "type": "string",
+          "description": "Character lifecycle status.",
+          "enum": ["active", "deleted"],
+          "minLength": 6,
+          "maxLength": 16
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server creation timestamp."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server last update timestamp."
+        }
+      },
+      "required": [
+        "ownerId",
+        "name",
+        "classId",
+        "level",
+        "exp",
+        "gold",
+        "gems",
+        "statPoints",
+        "str",
+        "agi",
+        "vit",
+        "ene",
+        "hpPotions",
+        "mpPotions",
+        "mapId",
+        "hairColor",
+        "accentColor",
+        "equippedWeapon",
+        "equippedArmor",
+        "equippedHelm",
+        "equippedGloves",
+        "equippedPants",
+        "equippedBoots",
+        "equippedRing",
+        "equippedWings",
+        "equippedMount",
+        "enhanceLevel",
+        "mounted",
+        "questIndex",
+        "questProgress",
+        "skillLevels",
+        "inventoryIds",
+        "status",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "AssetOverride": {
+      "title": "AssetOverride",
+      "description": "User-configured 3D GLTF/GLB model replacement mapping for characters, monsters, weapons, or mounts.",
+      "type": "object",
+      "properties": {
+        "ownerId": {
+          "type": "string",
+          "description": "Owner Firebase Auth UID referencing /accounts/{ownerId}.",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "slotKey": {
+          "type": "string",
+          "description": "Target 3D entity slot key (e.g., class_esper, mount_fenrir, mob_zombie).",
+          "minLength": 2,
+          "maxLength": 64,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "label": {
+          "type": "string",
+          "description": "Display label for custom asset.",
+          "minLength": 1,
+          "maxLength": 80
+        },
+        "modelUrl": {
+          "type": "string",
+          "description": "External HTTPS URL or local idb:// key for GLB/GLTF model.",
+          "minLength": 4,
+          "maxLength": 512
+        },
+        "scale": {
+          "type": "number",
+          "description": "Uniform scale multiplier (0.05 to 20)."
+        },
+        "offsetY": {
+          "type": "number",
+          "description": "Vertical ground pivot offset (-10 to 10)."
+        },
+        "rotationY": {
+          "type": "number",
+          "description": "Yaw rotation offset in degrees (-360 to 360)."
+        },
+        "status": {
+          "type": "string",
+          "description": "Override status.",
+          "enum": ["active", "archived"],
+          "minLength": 6,
+          "maxLength": 16
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server creation timestamp."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server last update timestamp."
+        }
+      },
+      "required": [
+        "ownerId",
+        "slotKey",
+        "label",
+        "modelUrl",
+        "scale",
+        "offsetY",
+        "rotationY",
+        "status",
+        "createdAt",
+        "updatedAt"
+      ]
+    }
+  },
+  "firestore": {
+    "/accounts/{userId}": {
+      "schema": "Account",
+      "description": "Game account root document keyed by Firebase Auth UID."
+    },
+    "/characters/{characterId}": {
+      "schema": "Character",
+      "description": "Playable characters owned by verified accounts."
+    },
+    "/assetOverrides/{overrideId}": {
+      "schema": "AssetOverride",
+      "description": "3D model replacement configurations owned by verified accounts."
+    }
+  }
+}

@@ -1,0 +1,252 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isVerified() {
+      return isSignedIn();
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() >= 1 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function hasActiveAccount(uid) {
+      return true;
+    }
+
+    // Safe for both Firestore Standard (int) and Enterprise Edition (double/float).
+    // Never calls float() on an already-float value (which throws a CEL overload error).
+    function isBoundedNum(val, minVal, maxVal) {
+      return (val is int && float(val) >= minVal && float(val) <= maxVal) ||
+        (val is float && val >= minVal && val <= maxVal);
+    }
+
+    function isSkillLevelValid(lvl) {
+      return isBoundedNum(lvl, 1.0, 20.0);
+    }
+
+    function isEquipId(val) {
+      return val is string && val.size() >= 1 && val.size() <= 48;
+    }
+
+    function isValidAccount(data) {
+      return data.keys().hasAll(['ownerId', 'gameUsername', 'serverId', 'status', 'createdAt', 'updatedAt']) &&
+        data.keys().hasOnly(['ownerId', 'gameUsername', 'serverId', 'status', 'createdAt', 'updatedAt']) &&
+        isValidId(data.ownerId) &&
+        data.ownerId == request.auth.uid &&
+        data.gameUsername is string && data.gameUsername.size() >= 3 && data.gameUsername.size() <= 24 && data.gameUsername.matches('^[a-zA-Z0-9_\\-]+$') &&
+        data.serverId is string && data.serverId.size() >= 1 && data.serverId.size() <= 32 && data.serverId.matches('^[a-zA-Z0-9_\\-]+$') &&
+        data.status is string && data.status.size() >= 6 && data.status.size() <= 16 && (data.status == 'active' || data.status == 'archived') &&
+        data.createdAt is timestamp &&
+        data.updatedAt is timestamp;
+    }
+
+    function isValidCharacter(data) {
+      return data.keys().hasAll([
+          'ownerId', 'name', 'classId', 'level', 'exp', 'gold', 'gems',
+          'statPoints', 'str', 'agi', 'vit', 'ene', 'hpPotions', 'mpPotions',
+          'mapId', 'hairColor', 'accentColor',
+          'equippedWeapon', 'equippedArmor', 'equippedHelm',
+          'equippedGloves', 'equippedPants', 'equippedBoots', 'equippedRing',
+          'equippedWings', 'equippedMount',
+          'enhanceLevel', 'mounted', 'questIndex', 'questProgress',
+          'skillLevels', 'inventoryIds', 'status', 'createdAt', 'updatedAt'
+        ]) &&
+        data.keys().hasOnly([
+          'ownerId', 'name', 'classId', 'level', 'exp', 'gold', 'gems',
+          'statPoints', 'str', 'agi', 'vit', 'ene', 'hpPotions', 'mpPotions',
+          'mapId', 'hairColor', 'accentColor',
+          'equippedWeapon', 'equippedArmor', 'equippedHelm',
+          'equippedGloves', 'equippedPants', 'equippedBoots', 'equippedRing',
+          'equippedWings', 'equippedMount',
+          'enhanceLevel', 'mounted', 'questIndex', 'questProgress',
+          'skillLevels', 'inventoryIds', 'status', 'createdAt', 'updatedAt'
+        ]) &&
+        isValidId(data.ownerId) &&
+        data.ownerId == request.auth.uid &&
+        data.name is string && data.name.size() >= 2 && data.name.size() <= 40 &&
+        data.classId is string && data.classId.size() >= 5 && data.classId.size() <= 16 &&
+        (data.classId == 'esper' || data.classId == 'vanguard' || data.classId == 'evolver') &&
+        isBoundedNum(data.level, 1.0, 500.0) &&
+        isBoundedNum(data.exp, 0.0, 1000000000.0) &&
+        isBoundedNum(data.gold, 0.0, 1000000000.0) &&
+        isBoundedNum(data.gems, 0.0, 1000000.0) &&
+        isBoundedNum(data.statPoints, 0.0, 50000.0) &&
+        isBoundedNum(data.str, 1.0, 50000.0) &&
+        isBoundedNum(data.agi, 1.0, 50000.0) &&
+        isBoundedNum(data.vit, 1.0, 50000.0) &&
+        isBoundedNum(data.ene, 1.0, 50000.0) &&
+        isBoundedNum(data.hpPotions, 0.0, 9999.0) &&
+        isBoundedNum(data.mpPotions, 0.0, 9999.0) &&
+        isBoundedNum(data.mapId, 1.0, 32.0) &&
+        data.hairColor is string && data.hairColor.size() >= 4 && data.hairColor.size() <= 9 && data.hairColor.matches('^#[0-9a-fA-F]{3,8}$') &&
+        data.accentColor is string && data.accentColor.size() >= 4 && data.accentColor.size() <= 9 && data.accentColor.matches('^#[0-9a-fA-F]{3,8}$') &&
+        isEquipId(data.equippedWeapon) &&
+        isEquipId(data.equippedArmor) &&
+        isEquipId(data.equippedHelm) &&
+        isEquipId(data.equippedGloves) &&
+        isEquipId(data.equippedPants) &&
+        isEquipId(data.equippedBoots) &&
+        isEquipId(data.equippedRing) &&
+        isEquipId(data.equippedWings) &&
+        isEquipId(data.equippedMount) &&
+        isBoundedNum(data.enhanceLevel, 0.0, 15.0) &&
+        data.mounted is bool &&
+        isBoundedNum(data.questIndex, 0.0, 200.0) &&
+        isBoundedNum(data.questProgress, 0.0, 10000.0) &&
+        data.skillLevels is list && data.skillLevels.size() == 6 &&
+        isSkillLevelValid(data.skillLevels[0]) &&
+        isSkillLevelValid(data.skillLevels[1]) &&
+        isSkillLevelValid(data.skillLevels[2]) &&
+        isSkillLevelValid(data.skillLevels[3]) &&
+        isSkillLevelValid(data.skillLevels[4]) &&
+        isSkillLevelValid(data.skillLevels[5]) &&
+        data.inventoryIds is list && data.inventoryIds.size() <= 40 &&
+        (data.inventoryIds.size() == 0 || isEquipId(data.inventoryIds[0])) &&
+        data.status is string && data.status.size() >= 6 && data.status.size() <= 16 && (data.status == 'active' || data.status == 'deleted') &&
+        data.createdAt is timestamp &&
+        data.updatedAt is timestamp;
+    }
+
+    function isValidAssetOverride(data) {
+      return data.keys().hasAll([
+          'ownerId', 'slotKey', 'label', 'modelUrl',
+          'scale', 'offsetY', 'rotationY', 'status', 'createdAt', 'updatedAt'
+        ]) &&
+        data.keys().hasOnly([
+          'ownerId', 'slotKey', 'label', 'modelUrl',
+          'scale', 'offsetY', 'rotationY', 'status', 'createdAt', 'updatedAt'
+        ]) &&
+        isValidId(data.ownerId) &&
+        data.ownerId == request.auth.uid &&
+        data.slotKey is string && data.slotKey.size() >= 2 && data.slotKey.size() <= 64 && data.slotKey.matches('^[a-zA-Z0-9_\\-]+$') &&
+        data.label is string && data.label.size() >= 1 && data.label.size() <= 80 &&
+        data.modelUrl is string && data.modelUrl.size() >= 4 && data.modelUrl.size() <= 512 &&
+        isBoundedNum(data.scale, 0.05, 20.0) &&
+        isBoundedNum(data.offsetY, -10.0, 10.0) &&
+        isBoundedNum(data.rotationY, -360.0, 360.0) &&
+        data.status is string && data.status.size() >= 6 && data.status.size() <= 16 && (data.status == 'active' || data.status == 'archived') &&
+        data.createdAt is timestamp &&
+        data.updatedAt is timestamp;
+    }
+
+    match /accounts/{userId} {
+      allow get: if isVerified() && isValidId(userId) && userId == request.auth.uid && (resource == null || existing().ownerId == request.auth.uid);
+      allow list: if false;
+
+      allow create: if isVerified() &&
+        isValidId(userId) &&
+        userId == request.auth.uid &&
+        isValidAccount(incoming()) &&
+        incoming().status == 'active' &&
+        incoming().createdAt == request.time &&
+        incoming().updatedAt == request.time;
+
+      allow update: if isVerified() &&
+        isValidAccount(incoming()) &&
+        isValidId(userId) &&
+        userId == request.auth.uid &&
+        existing().ownerId == request.auth.uid &&
+        existing().status != 'archived' &&
+        incoming().ownerId == existing().ownerId &&
+        incoming().createdAt == existing().createdAt &&
+        incoming().updatedAt == request.time && (
+          (incoming().status == 'active' && incoming().diff(existing()).affectedKeys().hasOnly(['gameUsername', 'serverId', 'status', 'updatedAt'])) ||
+          (incoming().status == 'archived' && incoming().diff(existing()).affectedKeys().hasOnly(['status', 'updatedAt']))
+        );
+
+      allow delete: if false;
+    }
+
+    match /characters/{characterId} {
+      allow get: if isVerified() && isValidId(characterId) && existing().ownerId == request.auth.uid && hasActiveAccount(request.auth.uid);
+      allow list: if isVerified() && existing().ownerId == request.auth.uid;
+
+      allow create: if isVerified() &&
+        isValidId(characterId) &&
+        isValidCharacter(incoming()) &&
+        incoming().status == 'active' &&
+        incoming().createdAt == request.time &&
+        incoming().updatedAt == request.time &&
+        hasActiveAccount(request.auth.uid);
+
+      allow update: if isVerified() &&
+        isValidCharacter(incoming()) &&
+        isValidId(characterId) &&
+        existing().ownerId == request.auth.uid &&
+        existing().status != 'deleted' &&
+        incoming().ownerId == existing().ownerId &&
+        incoming().classId == existing().classId &&
+        incoming().name == existing().name &&
+        incoming().createdAt == existing().createdAt &&
+        incoming().updatedAt == request.time && (
+          (incoming().status == 'active' && incoming().diff(existing()).affectedKeys().hasOnly([
+            'level', 'exp', 'gold', 'gems', 'statPoints',
+            'str', 'agi', 'vit', 'ene', 'hpPotions', 'mpPotions',
+            'mapId', 'hairColor', 'accentColor',
+            'equippedWeapon', 'equippedArmor', 'equippedHelm',
+            'equippedGloves', 'equippedPants', 'equippedBoots', 'equippedRing',
+            'equippedWings', 'equippedMount', 'enhanceLevel', 'mounted',
+            'questIndex', 'questProgress', 'skillLevels', 'inventoryIds', 'status', 'updatedAt'
+          ])) ||
+          (incoming().status == 'deleted' && incoming().diff(existing()).affectedKeys().hasOnly(['status', 'updatedAt']))
+        ) &&
+        hasActiveAccount(request.auth.uid);
+
+      allow delete: if isVerified() &&
+        isValidId(characterId) &&
+        existing().ownerId == request.auth.uid &&
+        hasActiveAccount(request.auth.uid);
+    }
+
+    match /assetOverrides/{overrideId} {
+      allow get: if isVerified() && isValidId(overrideId) && existing().ownerId == request.auth.uid && hasActiveAccount(request.auth.uid);
+      allow list: if isVerified() && existing().ownerId == request.auth.uid;
+
+      allow create: if isVerified() &&
+        isValidId(overrideId) &&
+        isValidAssetOverride(incoming()) &&
+        incoming().status == 'active' &&
+        incoming().createdAt == request.time &&
+        incoming().updatedAt == request.time &&
+        hasActiveAccount(request.auth.uid);
+
+      allow update: if isVerified() &&
+        isValidAssetOverride(incoming()) &&
+        isValidId(overrideId) &&
+        existing().ownerId == request.auth.uid &&
+        existing().status != 'archived' &&
+        incoming().ownerId == existing().ownerId &&
+        incoming().slotKey == existing().slotKey &&
+        incoming().createdAt == existing().createdAt &&
+        incoming().updatedAt == request.time && (
+          (incoming().status == 'active' && incoming().diff(existing()).affectedKeys().hasOnly([
+            'label', 'modelUrl', 'scale', 'offsetY', 'rotationY', 'status', 'updatedAt'
+          ])) ||
+          (incoming().status == 'archived' && incoming().diff(existing()).affectedKeys().hasOnly(['status', 'updatedAt']))
+        ) &&
+        hasActiveAccount(request.auth.uid);
+
+      allow delete: if isVerified() &&
+        isValidId(overrideId) &&
+        existing().ownerId == request.auth.uid &&
+        hasActiveAccount(request.auth.uid);
+    }
+  }
+}

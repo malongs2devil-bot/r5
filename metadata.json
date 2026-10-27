@@ -1,0 +1,6 @@
+{
+  "name": "Tận Thế Kỷ Nguyên 3D",
+  "description": "Game MMORPG 3D bối cảnh hậu tận thế với 3 hệ phái (Dị Năng Giả, Chiến Binh, Người Tiến Hoá), 6 kỹ năng, hơn 30 bản đồ, thú cưỡi, trang bị hiển thị 3D và hệ thống thay thế tài nguyên mô hình.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

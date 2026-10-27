@@ -1,0 +1,8 @@
+{
+  "srv_testcheck01": {
+    "ownerId": "srv_testcheck01",
+    "gameUsername": "TestCheck01",
+    "serverId": "s1",
+    "status": "active"
+  }
+}
